@@ -8,6 +8,7 @@ import com.examen.repository.UsuarioRepository;
 import com.examen.service.UsuarioService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -19,6 +20,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private UsuarioRepository usuarioRepository;
     private ModelMapper modelMapper;
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public UsuarioDTO crearUsuario(UsuarioDTO userDTO) {
@@ -27,6 +29,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new EmailAlreadyExistsException("Correo existente!");
         }
 
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         Usuario usuario = modelMapper.map(userDTO, Usuario.class);
         Usuario usuarioSaved = usuarioRepository.save(usuario);
         return modelMapper.map(usuarioSaved, UsuarioDTO.class);
@@ -47,6 +50,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         existingUser.setUsuario(usuarioDTO.getUsuario());
         existingUser.setApellidoPaterno(usuarioDTO.getApellidoPaterno());
         existingUser.setApellidoMaterno(usuarioDTO.getApellidoMaterno());
+        existingUser.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
         existingUser.setTelefono(usuarioDTO.getTelefono());
         existingUser.setCorreo(usuarioDTO.getCorreo());
 
